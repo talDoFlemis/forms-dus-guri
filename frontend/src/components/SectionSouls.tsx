@@ -1,20 +1,48 @@
-interface RowVagabundaProps {
-  email: string;
-  name: string;
-  tel: string;
+import { useEffect, useState } from "react";
+import { User } from "./SectionForms";
+
+interface UserFromDB extends User {
+  id: number;
+  image: string;
 }
 
-const RowVagabunda = ({ email, name, tel }: RowVagabundaProps) => {
+const RowVagabunda = ({
+  nome,
+  idade,
+  profissao,
+  mensagem,
+  image,
+}: UserFromDB) => {
   return (
-    <tr className="text-white bg-surface2">
-      <td>{email}</td>
-      <td>{name}</td>
-      <td>{tel}</td>
-    </tr>
+    <li className="grid overflow-hidden place-items-center rounded-lg md:grid-cols-2 bg-surface2">
+      <img src={image} alt="pepe" />
+      <div className="flex flex-col gap-8">
+        <h3 className="text-5xl font-caveat text-peach">{nome}</h3>
+        <span className="text-4xl font-bold text-mauve">{idade}</span>
+        <p className="text-3xl text-sapphire">{profissao}</p>
+        <p className="text-2xl text-white">{mensagem}</p>
+      </div>
+    </li>
   );
 };
 
 const SectionSoul = () => {
+  const [mtfks, setMtfks] = useState<UserFromDB[]>([]);
+
+  const fetchMtfks = async () => {
+    try {
+      const resp = await fetch(`http://localhost:4000/tubias`);
+      const data = await resp.json();
+      setMtfks(data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    fetchMtfks();
+  }, []);
+
   return (
     <section className="container flex flex-col items-center p-8 mx-auto space-y-16 text-center">
       <h1 className="text-3xl md:text-6xl font-nabla">
@@ -26,25 +54,23 @@ const SectionSoul = () => {
         width={200}
         height={200}
       />
-      <table className="w-full table-auto">
-        <thead>
-          <tr className="bg-rosewater">
-            <th className="py-3 px-6">Email</th>
-            <th className="py-3 px-6">Nome</th>
-            <th className="py-3 px-6">Celular</th>
-          </tr>
-        </thead>
-        <tbody>
-          {/* {mtfks.map((mtfk: any) => ( */}
-          {/*   <RowVagabunda */}
-          {/*     key={mtfk.id} */}
-          {/*     email={mtfk.email} */}
-          {/*     name={mtfk.name} */}
-          {/*     tel={mtfk.phone} */}
-          {/*   /> */}
-          {/* ))} */}
-        </tbody>
-      </table>
+      {mtfks.length !== 0 ? (
+        <ul className="flex flex-col gap-8">
+          {mtfks.map((mtfk: UserFromDB) => (
+            <RowVagabunda
+              key={mtfk.id}
+              id={mtfk.id}
+              nome={mtfk.nome}
+              idade={mtfk.idade}
+              profissao={mtfk.profissao}
+              mensagem={mtfk.mensagem}
+              image={mtfk.image}
+            />
+          ))}
+        </ul>
+      ) : (
+        <div className="text-white bg-surface2">Nenhum vagabundo</div>
+      )}
     </section>
   );
 };
