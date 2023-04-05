@@ -16,4 +16,5 @@ model Tubias {
   idade Int
   profissao   String 
   mensagem  String @db.Text
+  image String
 }

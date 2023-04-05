@@ -12,7 +12,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost",
+    origin: "http://localhost:5173",
   })
 );
 
@@ -37,6 +37,8 @@ app.post("/tubias", async (req: Request, res: Response) => {
   }
 
   const parsedNumber = parseInt(idade);
+  const image = await fetch("https://pepe.ismaelb.dev/api/random");
+  const imageJson = await image.json();
 
   try {
     const user = await prisma.tubias.create({
@@ -45,6 +47,7 @@ app.post("/tubias", async (req: Request, res: Response) => {
         nome: nome,
         mensagem: mensagem,
         idade: parsedNumber,
+        image: imageJson.image,
       },
     });
     res.status(201).json(user);
