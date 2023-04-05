@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useForm } from "../hooks/useForm";
 
-type User = {
-  email: string;
-  name: string;
-  tel: string;
+export type User = {
+  nome: string;
+  idade: number;
+  profissao: string;
+  mensagem: string;
 };
 
 const ErrorMessage = ({ id, msg }: { id: string; msg: string }) => {
@@ -20,37 +21,42 @@ const SectionForms = () => {
   const { handleSubmit, handleOnBlur, handleChange, data, errors, valid } =
     useForm<User>({
       validations: {
-        name: {
+        nome: {
           pattern: {
             value: "^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$",
             message: "Nome invalido, apenas letras",
           },
         },
-        email: {
-          pattern: {
-            value: "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$",
-            message: "Email invalido",
+        idade: {
+          custom: {
+            isValid: (value) => parseInt(value) > 0 && parseInt(value) < 100,
+            message: "Idade invalida",
           },
         },
-        tel: {
+        profissao: {
           pattern: {
-            value: "^([1-9]{2}\\s?)?[9]?\\d{4}(-|\\s)?\\d{4}$",
-            message: "Telefone invalido",
+            value: "^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$",
+            message: "Profissao invalida, apenas letras",
+          },
+        },
+        mensagem: {
+          custom: {
+            isValid: (value) => value.length > 10,
+            message: "O conteúdo da mensagem deve ser maior que 10 caracteres",
           },
         },
       },
-      onSubmit: (data: User) => kkkkk(data),
+      onSubmit: (data: User) => submitMeDaddy(data),
     });
 
-  const kkkkk = async (data: User) => {
+  const submitMeDaddy = async (data: User) => {
     setIsSubmiting(true);
-    console.log(data);
 
     try {
-      await fetch("/api/contact", {
+      await fetch("http://localhost:3000", {
         method: "POST",
-        body: JSON.stringify({ tubias: 123 }),
-        headers: { "Content-type": "application/json; charset=UTF-8" },
+        body: JSON.stringify(data),
+        headers: { "Content-type": "application/json" },
       });
     } catch (error) {
       console.log("error dus guri");
@@ -67,58 +73,84 @@ const SectionForms = () => {
       <form className="mx-auto w-full md:w-1/2" onSubmit={handleSubmit}>
         <div className="relative z-0 mb-6 w-full group">
           <input
-            type="email"
-            name="email"
-            id="email"
+            name="nome"
+            id="nome"
             className={`floating-input peer ${
-              errors?.email ? "form-error" : ""
+              errors?.nome ? "form-error" : ""
             }`}
             placeholder=" "
-            value={data.email || ""}
+            value={data.nome || ""}
             required
-            onChange={handleChange("email")}
-            onBlur={handleOnBlur("email")}
+            onChange={handleChange("nome")}
+            onBlur={handleOnBlur("nome")}
           />
-          <label htmlFor="email" className="floating-label">
-            Email
+          <label htmlFor="nome" className="floating-label">
+            Nome
           </label>
-          {errors?.email && <ErrorMessage id="name-error" msg={errors.email} />}
+          {errors?.nome && <ErrorMessage id="name-error" msg={errors.nome} />}
         </div>{" "}
         <div className="relative z-0 mb-6 w-full group">
           <input
             type="text"
-            name="name"
-            id="name"
+            name="idade"
+            id="idade"
             className={`floating-input peer ${
-              errors?.name ? "form-error" : ""
+              errors?.idade ? "form-error" : ""
             }`}
             placeholder=" "
-            value={data.name || ""}
+            value={data.idade || ""}
             required
-            onChange={handleChange("name")}
-            onBlur={handleOnBlur("name")}
+            onChange={handleChange("idade")}
+            onBlur={handleOnBlur("idade")}
           />
-          <label htmlFor="name" className="floating-label">
-            Nome
+          <label htmlFor="idade" className="floating-label">
+            Idade
           </label>
-          {errors?.name && <ErrorMessage id="name-error" msg={errors.name} />}
+          {errors?.idade && (
+            <ErrorMessage id="mensagem-error" msg={errors.idade} />
+          )}
         </div>{" "}
         <div className="relative z-0 mb-6 w-full group">
           <input
-            type="tel"
-            name="tel"
-            id="tel"
-            className={`floating-input peer ${errors?.tel ? "form-error" : ""}`}
+            type="text"
+            name="profissao"
+            id="profissao"
+            className={`floating-input peer ${
+              errors?.profissao ? "form-error" : ""
+            }`}
             placeholder=" "
-            value={data.tel || ""}
+            value={data.profissao || ""}
             required
-            onChange={handleChange("tel")}
-            onBlur={handleOnBlur("tel")}
+            onChange={handleChange("profissao")}
+            onBlur={handleOnBlur("profissao")}
           />
-          <label htmlFor="tel" className="floating-label">
-            Celular
+          <label htmlFor="profissao" className="floating-label">
+            Profissao
           </label>
-          {errors?.tel && <ErrorMessage id="tel-error" msg={errors.tel} />}
+          {errors?.profissao && (
+            <ErrorMessage id="profissao-error" msg={errors.profissao} />
+          )}
+        </div>{" "}
+        <div className="relative z-0 mb-6 w-full group">
+          <input
+            type="text"
+            name="mensagem"
+            id="mensagem"
+            className={`floating-input peer ${
+              errors?.mensagem ? "form-error" : ""
+            }`}
+            placeholder=" "
+            value={data.mensagem || ""}
+            required
+            onChange={handleChange("mensagem")}
+            onBlur={handleOnBlur("mensagem")}
+          />
+          <label htmlFor="mensagem" className="floating-label">
+            Mensagem
+          </label>
+          {errors?.mensagem && (
+            <ErrorMessage id="mensagem-error" msg={errors.mensagem} />
+          )}
         </div>{" "}
         <button
           type="submit"
