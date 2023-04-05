@@ -9,7 +9,7 @@ type User = {
 
 const ErrorMessage = ({ id, msg }: { id: string; msg: string }) => {
   return (
-    <span id={id} className="block text-sm text-red-500">
+    <span id={id} className="block text-sm text-red">
       {msg}
     </span>
   );
@@ -17,34 +17,34 @@ const ErrorMessage = ({ id, msg }: { id: string; msg: string }) => {
 
 const SectionForms = () => {
   const [isSubmiting, setIsSubmiting] = useState(false);
-  const { handleSubmit, handleChange, data, errors } = useForm<User>({
-    validations: {
-      name: {
-        pattern: {
-          value: "^[A-Za-z]*$",
-          message: "Nome invalido, apenas letras e sem espaços, por favor",
+  const { handleSubmit, handleOnBlur, handleChange, data, errors, valid } =
+    useForm<User>({
+      validations: {
+        name: {
+          pattern: {
+            value: "^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$",
+            message: "Nome invalido, apenas letras",
+          },
+        },
+        email: {
+          pattern: {
+            value: "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$",
+            message: "Email invalido",
+          },
+        },
+        tel: {
+          pattern: {
+            value: "^([1-9]{2}\\s?)?[9]?\\d{4}(-|\\s)?\\d{4}$",
+            message: "Telefone invalido",
+          },
         },
       },
-      email: {
-        pattern: {
-          value: "/^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,}$/",
-          message: "Email invalido",
-        },
-      },
-      tel: {
-        pattern: {
-          value: ".*",
-          message: "Telefone invalido",
-        },
-      },
-    },
-    onSubmit: (data: User) => {
-      console.log("data", data);
-    },
-  });
+      onSubmit: (data: User) => kkkkk(data),
+    });
 
-  const kkkkk = async (e: React.FormEvent<HTMLFormElement>) => {
+  const kkkkk = async (data: User) => {
     setIsSubmiting(true);
+    console.log(data);
 
     try {
       await fetch("/api/contact", {
@@ -59,8 +59,6 @@ const SectionForms = () => {
     }
   };
 
-  console.log(errors);
-
   return (
     <section className="container flex flex-col p-8 mx-auto space-y-16">
       <h1 className="text-3xl text-center md:text-6xl font-nabla">
@@ -72,11 +70,14 @@ const SectionForms = () => {
             type="email"
             name="email"
             id="email"
-            className="floating-input peer"
+            className={`floating-input peer ${
+              errors?.email ? "form-error" : ""
+            }`}
             placeholder=" "
             value={data.email || ""}
             required
             onChange={handleChange("email")}
+            onBlur={handleOnBlur("email")}
           />
           <label htmlFor="email" className="floating-label">
             Email
@@ -88,11 +89,14 @@ const SectionForms = () => {
             type="text"
             name="name"
             id="name"
-            className="floating-input peer"
+            className={`floating-input peer ${
+              errors?.name ? "form-error" : ""
+            }`}
             placeholder=" "
             value={data.name || ""}
             required
             onChange={handleChange("name")}
+            onBlur={handleOnBlur("name")}
           />
           <label htmlFor="name" className="floating-label">
             Nome
@@ -104,11 +108,12 @@ const SectionForms = () => {
             type="tel"
             name="tel"
             id="tel"
-            className="floating-input peer"
+            className={`floating-input peer ${errors?.tel ? "form-error" : ""}`}
             placeholder=" "
             value={data.tel || ""}
             required
             onChange={handleChange("tel")}
+            onBlur={handleOnBlur("tel")}
           />
           <label htmlFor="tel" className="floating-label">
             Celular
@@ -117,12 +122,8 @@ const SectionForms = () => {
         </div>{" "}
         <button
           type="submit"
-          disabled={false}
-          className={`py-2 w-full text-base font-bold rounded-full transition-all duration-500 ease-in-out ${
-            !isSubmiting
-              ? "hover:scale-105 bg-peach hover:bg-maroon"
-              : "bg-overlay2"
-          }`}
+          disabled={isSubmiting || !valid}
+          className="py-2 w-full text-base font-bold rounded-full transition-all duration-500 ease-in-out hover:scale-105 bg-peach hover:bg-maroon disabled:bg-overlay2 disabled:hover:scale-100"
         >
           Submit
         </button>

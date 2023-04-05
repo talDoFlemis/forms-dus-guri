@@ -14,6 +14,6 @@
   }
 
   .form-error {
-    @apply block py-2.5 px-0 w-full text-sm text-white bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:ring-0 focus:outline-none focus:border-red;
+    @apply block py-2.5 px-0 w-full text-sm text-red bg-transparent border-0 border-b-2 border-red appearance-none focus:ring-0 focus:outline-none;
   }
 }

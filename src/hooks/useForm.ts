@@ -26,8 +26,8 @@ export const useForm = <T extends Record<keyof T, any> = {}>(options?: {
 }) => {
   const [data, setData] = useState<T>((options?.initialValues || {}) as T);
   const [errors, setErrors] = useState<ErrorRecord<T>>({});
+  const [valid, setValid] = useState<boolean>(true);
 
-  // Needs to extend unknown so we can add a generic to an arrow function
   const handleChange =
     <S extends unknown>(key: keyof T, sanitizeFn?: (value: string) => S) =>
     (e: ChangeEvent<HTMLInputElement & HTMLSelectElement>) => {
@@ -38,13 +38,26 @@ export const useForm = <T extends Record<keyof T, any> = {}>(options?: {
       });
     };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleOnBlur =
+    <S extends unknown>(key: keyof T, sanitizeFn?: (value: string) => S) =>
+    //@ts-ignore
+    (e: FocusEvent<HTMLInputElement & HTMLSelectElement>) => {
+      const value = sanitizeFn ? sanitizeFn(e.target.value) : e.target.value;
+      setData({
+        ...data,
+        [key]: value,
+      });
+      validation(key as string);
+    };
+
+  const validation = (field?: String) => {
     const validations = options?.validations;
     if (validations) {
       let valid = true;
       const newErrors: ErrorRecord<T> = {};
       for (const key in validations) {
+        if (field && key !== field) continue;
+
         const value = data[key];
         const validation = validations[key];
         if (validation?.required?.value && !value) {
@@ -67,14 +80,21 @@ export const useForm = <T extends Record<keyof T, any> = {}>(options?: {
 
       if (!valid) {
         setErrors(newErrors);
+        setValid(false);
         return;
       }
     }
 
     setErrors({});
+    setValid(true);
+  };
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    validation();
 
     if (options?.onSubmit) {
-      options.onSubmit();
+      options.onSubmit(data);
     }
   };
 
@@ -83,5 +103,7 @@ export const useForm = <T extends Record<keyof T, any> = {}>(options?: {
     handleChange,
     handleSubmit,
     errors,
+    valid,
+    handleOnBlur,
   };
 };
