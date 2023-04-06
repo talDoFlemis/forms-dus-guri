@@ -53,7 +53,7 @@ const SectionForms = () => {
     setIsSubmiting(true);
 
     try {
-      await fetch(`${process.env.BACKEND}:4000/tubias`, {
+      await fetch(`${import.meta.env.VITE_BACKEND}/tubias`, {
         method: "POST",
         body: JSON.stringify(data),
         headers: { "Content-type": "application/json" },

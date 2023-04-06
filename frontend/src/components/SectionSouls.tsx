@@ -31,7 +31,7 @@ const SectionSoul = () => {
 
   const fetchMtfks = async () => {
     try {
-      const resp = await fetch(`${process.env.BACKEND}:4000/tubias`);
+      const resp = await fetch(`${import.meta.env.VITE_BACKEND}/tubias`);
       const data = await resp.json();
       setMtfks(data);
     } catch (e) {
